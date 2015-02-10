@@ -8,7 +8,9 @@ import java.net.InetSocketAddress
 class EchoHandler extends Actor {
   import Tcp._
   def receive = {
-    case Received(data) => sender() ! Write(data)
+    case Received(data) =>
+      println("EchoHandler received: " + data)
+      sender() ! Write(data)
     case PeerClosed => context stop self
   }
 }

@@ -14,6 +14,10 @@ object Client {
     val system = ActorSystem("Client")
     val handler = system.actorOf(Props[Handler])
     val client = system.actorOf(props(new InetSocketAddress("127.0.0.1", 6000), handler))
+
+    Thread.sleep(1000)
+
+    client ! ByteString("Hello")
   }
 }
 
