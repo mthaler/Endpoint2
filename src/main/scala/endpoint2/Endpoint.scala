@@ -1,5 +1,7 @@
 package endpoint2
 
+import akka.actor.ActorRef
+
 trait Endpoint[S, R] {
 
   /**
@@ -10,18 +12,9 @@ trait Endpoint[S, R] {
   def name: String
 
   /**
-   * Sends an item. This method will not block
-   *
-   * @param item item to send
-   */
-  def send(item : S)
-
-  /**
-   * Handler that handles received data. Usually this is an actor but we also allow for other handlers
+   * Handler that handles received data
    *
    * @return
    */
-  def handler: Handler[R]
-
-  def dispose()
+  def handler: ActorRef
 }
