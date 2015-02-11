@@ -1,6 +1,8 @@
 package endpoint2
 
 import akka.actor.{ActorSystem, ActorRef, Props}
+import akka.io.Tcp.Connect
+import akka.io.{Tcp, IO}
 import akka.util.ByteString
 import java.net.InetSocketAddress
 
@@ -19,9 +21,13 @@ object Client {
   }
 }
 
-class Client(remote: InetSocketAddress, handler: AbstractTcpHandler[ByteString])(system: ActorSystem) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler, remote)(system) {
+class Client(remote: InetSocketAddress, handler: AbstractTcpHandler[ByteString])(implicit val system: ActorSystem) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler, remote) {
+
+  val connectionHandler = system.actorOf(Props(new AbstractTcpConnectionHandler[ByteString](handler) {
+    IO(Tcp) ! Connect(remote)
+
+    override def deserialize(bytes: ByteString): ByteString = bytes
+  }))
 
   override def serialize(item: ByteString): ByteString = item
-
-  override def deserialize(bytes: ByteString): ByteString = bytes
 }
