@@ -1,10 +1,7 @@
 package endpoint2
 
 object Endpoint {
-
-  sealed abstract trait EndpointMessage[+S, +R]
-  case class Send[S](item: S) extends EndpointMessage[S, Nothing]
-  case class NewData[R](item: R) extends EndpointMessage[Nothing, R]
+  case class NewData[R](item: R)
 
 }
 
@@ -20,9 +17,17 @@ trait Endpoint[S, R] {
   def name: String
 
   /**
+   * Sends an item. This method will not block
+   *
+   * @param item item to send
+   * @return
+   */
+  def send(item: S)
+
+  /**
    * Handler that handles received data
    *
    * @return
    */
-  def handler: TypedActorRef[EndpointMessage[S, R]]
+  def handler: TypedActorRef[NewData[R]]
 }
