@@ -1,8 +1,7 @@
 package endpoint2
 
-import akka.actor.{ActorSystem, Actor, ActorRef, Props}
+import akka.actor.{ActorSystem, Actor, Props}
 import akka.io.{ IO, Tcp }
-import akka.util.ByteString
 import java.net.InetSocketAddress
 
 object Server {

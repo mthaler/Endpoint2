@@ -1,12 +1,9 @@
 package endpoint2
 
-import akka.actor.{ActorSystem, Actor, ActorRef, Props}
-import akka.io.{ IO, Tcp }
-import akka.util.ByteString
-import java.net.InetSocketAddress
+import akka.actor.Actor
+import akka.io.Tcp.{Write, PeerClosed, Received}
 
 class EchoHandler extends Actor {
-  import Tcp._
   def receive = {
     case Received(data) =>
       println("EchoHandler received: " + data)
