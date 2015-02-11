@@ -12,7 +12,7 @@ object Client {
 
   def main(args: Array[String]): Unit = {
     val system = ActorSystem("Client")
-    val handler = system.actorOf(Props[Handler])
+    val handler = system.actorOf(Props[ClientHandler])
     val client = system.actorOf(props(new InetSocketAddress("127.0.0.1", 6000), handler))
 
     Thread.sleep(1000)
