@@ -1,13 +1,6 @@
 package endpoint2
 
-object Endpoint {
-  case class NewData[R](item: R)
-
-}
-
 trait Endpoint[S, R] {
-
-  import Endpoint._
 
   /**
    * Name for this endpoint, used for debugging
@@ -29,5 +22,5 @@ trait Endpoint[S, R] {
    *
    * @return
    */
-  def handler: TypedActorRef[NewData[R]]
+  def handler: Handler[R]
 }

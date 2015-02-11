@@ -6,19 +6,18 @@ import akka.actor.ActorSystem
 import akka.io.{Tcp, IO}
 import akka.io.Tcp._
 import akka.util.ByteString
-import endpoint2.Endpoint.NewData
 import akka.actor.ActorDSL._
 
-abstract class AbstractTcpEndpoint[S, R](name: String, handler: TypedActorRef[NewData[R]], remote: InetSocketAddress)(implicit val system: ActorSystem) extends AbstractEndpoint[S, R](name, handler) {
+abstract class AbstractTcpEndpoint[S, R](name: String, handler: AbstractTcpHandler[R], remote: InetSocketAddress)(implicit val system: ActorSystem) extends AbstractEndpoint[S, R](name, handler) {
 
   val h = actor(new Act {
     whenStarting { IO(Tcp) ! Connect(remote) }
     become {
-      case CommandFailed(_: Connect) =>
-        handler.actorRef ! "connect failed"
+      case CommandFailed(connect: Connect) =>
+        handler.connectFailed(connect)
         context stop self
       case c @ Connected(remote, local) =>
-        handler.actorRef ! c
+        handler.connected(c)
         val connection = sender()
         connection ! Register(self)
         become {
@@ -26,13 +25,13 @@ abstract class AbstractTcpEndpoint[S, R](name: String, handler: TypedActorRef[Ne
             connection ! Write(data)
           case CommandFailed(w: Write) =>
             // O/S buffer was full
-            handler.actorRef ! "write failed"
+            println("Write failed: " + w)
           case Received(data) =>
-            handler.actorRef ! NewData[R](deserialize(data))
+            handler.newData(deserialize(data))
           case "close" =>
             connection ! Close
-          case _: ConnectionClosed =>
-            handler.actorRef ! "connection closed"
+          case closed: ConnectionClosed =>
+            handler.connectionClosed(closed)
             context stop self
         }
     }

@@ -4,8 +4,6 @@ import akka.actor.{ActorSystem, ActorRef, Props}
 import akka.util.ByteString
 import java.net.InetSocketAddress
 
-import endpoint2.Endpoint.NewData
-
 object Client {
 
   def props(remote: InetSocketAddress, replies: ActorRef) =
@@ -13,8 +11,7 @@ object Client {
 
   def main(args: Array[String]): Unit = {
     val system = ActorSystem("Client")
-    val handler = TypedActorRef[NewData[ByteString]](system.actorOf(Props[ClientHandler]))
-    val client = new Client(new InetSocketAddress("127.0.0.1", 6000), handler)(system)
+    val client = new Client(new InetSocketAddress("127.0.0.1", 6000), new ClientHandler)(system)
 
     Thread.sleep(1000)
 
@@ -22,7 +19,7 @@ object Client {
   }
 }
 
-class Client(remote: InetSocketAddress, handler: TypedActorRef[NewData[ByteString]])(system: ActorSystem) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler, remote)(system) {
+class Client(remote: InetSocketAddress, handler: AbstractTcpHandler[ByteString])(system: ActorSystem) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler, remote)(system) {
 
   override def serialize(item: ByteString): ByteString = item
 
