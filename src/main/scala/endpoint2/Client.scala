@@ -5,6 +5,8 @@ import akka.io.{ IO, Tcp }
 import akka.util.ByteString
 import java.net.InetSocketAddress
 
+import endpoint2.Endpoint.EndpointMessage
+
 object Client {
 
   def props(remote: InetSocketAddress, replies: ActorRef) =
@@ -21,10 +23,12 @@ object Client {
   }
 }
 
-class Client(remote: InetSocketAddress, handler: ActorRef) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler) {
+class Client(remote: InetSocketAddress, handler: TypedActorRef[EndpointMessage[ByteString, ByteString]]) extends AbstractTcpEndpoint[ByteString, ByteString]("client", handler) {
 
   import Tcp._
   import context.system
 
   IO(Tcp) ! Connect(remote)
+
+  override def deserialize(bytes: ByteString): ByteString = bytes
 }

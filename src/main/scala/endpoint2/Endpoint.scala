@@ -1,8 +1,16 @@
 package endpoint2
 
-import akka.actor.ActorRef
+object Endpoint {
+
+  sealed abstract trait EndpointMessage[+S, +R]
+  case class Send[S](item: S) extends EndpointMessage[S, Nothing]
+  case class NewData[R](item: R) extends EndpointMessage[Nothing, R]
+
+}
 
 trait Endpoint[S, R] {
+
+  import Endpoint._
 
   /**
    * Name for this endpoint, used for debugging
@@ -16,5 +24,5 @@ trait Endpoint[S, R] {
    *
    * @return
    */
-  def handler: ActorRef
+  def handler: TypedActorRef[EndpointMessage[S, R]]
 }

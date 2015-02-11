@@ -1,5 +1,5 @@
 package endpoint2
 
-import akka.actor.ActorRef
+import endpoint2.Endpoint.EndpointMessage
 
-abstract class AbstractEndpoint[S, R](val name: String, val handler: ActorRef) extends Endpoint[S, R]
+abstract class AbstractEndpoint[S, R](val name: String, val handler: TypedActorRef[EndpointMessage[S, R]]) extends Endpoint[S, R]
